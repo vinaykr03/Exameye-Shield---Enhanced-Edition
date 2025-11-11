@@ -251,12 +251,15 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                     
                     if frame is not None:
+                        logger.info(f"🔍 Frame decoded successfully: {frame.shape}, Calibration: pitch={message.get('calibrated_pitch', 0.0)}, yaw={message.get('calibrated_yaw', 0.0)}")
                         result = proctoring_service.process_frame(
                             frame,
                             session_id,
                             message.get('calibrated_pitch', 0.0),
                             message.get('calibrated_yaw', 0.0)
                         )
+                        logger.info(f"🎯 Detection result: {len(result.get('violations', []))} violations found")
+                        logger.info(f"📊 Detection details: faces={result.get('face_count', 0)}, no_person={result.get('no_person', False)}, multiple={result.get('multiple_faces', False)}, looking_away={result.get('looking_away', False)}, phone={result.get('phone_detected', False)}, book={result.get('book_detected', False)}")
                         # Persist violations with snapshot evidence
                         try:
                             exam_id = message.get('exam_id')
