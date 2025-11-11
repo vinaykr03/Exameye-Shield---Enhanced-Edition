@@ -50,8 +50,13 @@ export const useProctoringWebSocket = ({
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const maxReconnectAttempts = 50;
 
-  // WebSocket URL - Replace with your Python backend URL
-  const WS_URL = import.meta.env.VITE_PROCTORING_WS_URL || 'ws://localhost:8001';
+  // WebSocket URL - Construct from backend URL to ensure same domain
+  const getWebSocketURL = () => {
+    const backendURL = import.meta.env.REACT_APP_BACKEND_URL || import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:8001';
+    // Convert http/https to ws/wss
+    return backendURL.replace('https://', 'wss://').replace('http://', 'ws://');
+  };
+  const WS_URL = getWebSocketURL();
 
   // Update the ref whenever onViolation changes
   useEffect(() => {
