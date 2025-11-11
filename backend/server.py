@@ -311,6 +311,22 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                             'type': 'detection_result',
                             'data': result
                         })
+                        logger.info(f"📤 Detection result sent to client")
+                        
+                        # Also send individual violation alerts to frontend
+                        if result.get('violations'):
+                            for v in result['violations']:
+                                await websocket.send_json({
+                                    'type': 'violation',
+                                    'data': {
+                                        'type': v.get('type'),
+                                        'severity': v.get('severity'),
+                                        'message': v.get('message'),
+                                        'confidence': v.get('confidence'),
+                                        'timestamp': datetime.utcnow().isoformat()
+                                    }
+                                })
+                                logger.info(f"🚨 Violation alert sent to frontend: {v.get('type')}")
                 else:
                     # Optionally inform client that frame was skipped due to throttle
                     await websocket.send_json({
