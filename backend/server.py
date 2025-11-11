@@ -268,13 +268,18 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                             snapshot_b64 = result.get('snapshot_base64')
                             # If there are violations, upload snapshot and insert rows
                             if result.get('violations'):
+                                logger.info(f"💾 Saving {len(result['violations'])} violations to database...")
                                 image_url = None
                                 # Upload once and reuse URL for all violations in this frame
                                 if snapshot_b64:
+                                    logger.info(f"📸 Uploading snapshot for violation...")
                                     image_url = _upload_snapshot_and_get_url(
                                         supabase, exam_id or "unknown_exam", student_id or "unknown_student",
                                         result['violations'][0]['type'], snapshot_b64
                                     )
+                                    logger.info(f"✅ Snapshot uploaded: {image_url}")
+                                else:
+                                    logger.warning("⚠️ No snapshot available for violation")
                                 # Insert one record per violation type
                                 for v in result['violations']:
                                     violation_record = {
@@ -294,10 +299,13 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                                     }
                                     try:
                                         supabase.table('violations').insert(violation_record).execute()
+                                        logger.info(f"✅ Violation saved: {v.get('type')} - {v.get('message')}")
                                     except Exception as db_err:
-                                        logger.error(f"Insert violation failed: {db_err}")
+                                        logger.error(f"❌ Insert violation failed: {db_err}")
+                            else:
+                                logger.info("✅ No violations detected in this frame")
                         except Exception as persist_err:
-                            logger.error(f"Persisting violation failed: {persist_err}")
+                            logger.error(f"❌ Persisting violation failed: {persist_err}")
                         # Send results back to client
                         await websocket.send_json({
                             'type': 'detection_result',
