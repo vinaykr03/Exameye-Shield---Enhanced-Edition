@@ -228,7 +228,7 @@ const StudentExam = () => {
 
   const startAIMonitoring = () => {
     console.log('🎬 Starting AI monitoring - capturing frames every 2 seconds');
-    console.log('📊 Current state:', { 
+    console.log('📊 Initial state:', { 
       hasVideo: !!videoRef.current, 
       hasStream: !!streamRef.current, 
       hasExamId: !!examId, 
@@ -237,11 +237,9 @@ const StudentExam = () => {
     });
     
     detectionIntervalRef.current = setInterval(async () => {
+      // Only check video/stream at capture time
       if (!videoRef.current || !streamRef.current) {
-        console.warn('⚠️ Cannot capture frame:', { 
-          hasVideo: !!videoRef.current, 
-          hasStream: !!streamRef.current
-        });
+        console.warn('⚠️ Cannot capture frame - no video/stream');
         return;
       }
 
@@ -251,6 +249,13 @@ const StudentExam = () => {
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
+        
+        // Skip if video hasn't loaded yet
+        if (canvas.width === 0 || canvas.height === 0) {
+          console.warn('⚠️ Video not ready yet (dimensions 0x0)');
+          return;
+        }
+        
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         
@@ -271,9 +276,9 @@ const StudentExam = () => {
         // Always update audio level state for UI display (real-time update)
         setAudioLevel(currentAudioLevel);
 
-        // Send to backend via WebSocket if connected
-        if (wsConnected) {
-          console.log(`📡 Sending frame to backend (audio: ${currentAudioLevel}%, WS connected: ${wsConnected})`);
+        // Send to backend via WebSocket if connected AND we have exam data
+        if (wsConnected && examId && studentData) {
+          console.log(`📡 Sending frame to backend (audio: ${currentAudioLevel}%, WS: ${wsConnected}, examId: ${examId})`);
           // Send frame to Python backend
           sendFrame(snapshot, currentAudioLevel);
 
@@ -281,8 +286,12 @@ const StudentExam = () => {
           sendAudioLevel(currentAudioLevel);
           console.log('✅ Frame and audio sent to backend');
         } else {
-          // Log warning but continue monitoring locally
-          console.warn('❌ WebSocket not connected - frame not sent');
+          // Log warning with detailed state
+          console.warn('❌ Cannot send frame:', { 
+            wsConnected, 
+            hasExamId: !!examId, 
+            hasStudentData: !!studentData 
+          });
         }
       } catch (error) {
         console.error('❌ AI monitoring error:', error);
