@@ -23,8 +23,8 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 # Test data
 TEST_SESSION_ID = f"test-session-{uuid.uuid4()}"
-TEST_EXAM_ID = "test-exam-123"
-TEST_STUDENT_ID = "test-student-456"
+TEST_EXAM_ID = str(uuid.uuid4())  # Use proper UUID format
+TEST_STUDENT_ID = str(uuid.uuid4())  # Use proper UUID format
 TEST_STUDENT_NAME = "John Doe"
 
 # Initialize Supabase client for verification
