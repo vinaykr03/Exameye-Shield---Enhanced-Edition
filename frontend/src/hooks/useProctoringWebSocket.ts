@@ -139,7 +139,7 @@ export const useProctoringWebSocket = ({
 
   const sendFrame = useCallback((frameBase64: string, audioLevel?: number) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
+      const payload = {
         type: 'frame',
         frame: frameBase64,
         calibrated_pitch: calibratedPitch,
@@ -148,7 +148,18 @@ export const useProctoringWebSocket = ({
         student_id: studentId,
         student_name: studentName,
         audio_level: audioLevel,
-      }));
+      };
+      console.log('📤 Sending frame to backend:', {
+        type: payload.type,
+        frameSize: frameBase64.length,
+        audioLevel,
+        examId,
+        studentId,
+        wsState: wsRef.current.readyState
+      });
+      wsRef.current.send(JSON.stringify(payload));
+    } else {
+      console.error('❌ Cannot send frame - WebSocket not open. State:', wsRef.current?.readyState);
     }
   }, [calibratedPitch, calibratedYaw, examId, studentId, studentName]);
 
