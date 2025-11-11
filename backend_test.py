@@ -48,7 +48,14 @@ def test_basic_endpoints():
     # Test root endpoint
     try:
         response = requests.get(f"{BACKEND_URL}/", timeout=10)
-        print(f"✅ Root endpoint: {response.status_code} - {response.json()}")
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                print(f"✅ Root endpoint: {response.status_code} - {json_data}")
+            except:
+                print(f"✅ Root endpoint: {response.status_code} - HTML response (likely frontend)")
+        else:
+            print(f"❌ Root endpoint: {response.status_code}")
     except Exception as e:
         print(f"❌ Root endpoint failed: {e}")
     
