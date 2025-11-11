@@ -111,11 +111,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "FastAPI backend running on port 8001, connected to Supabase, all endpoints working. Added /api/violations POST and GET endpoints"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Backend API working correctly. Environment check API returns proper lighting_ok/face_detected status. Health endpoint works locally (models_loaded: true). Minor: External health endpoint routing returns frontend HTML instead of backend JSON."
   
   - task: "Supabase Database Connection"
     implemented: true
