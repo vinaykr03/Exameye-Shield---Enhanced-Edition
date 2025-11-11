@@ -224,10 +224,20 @@ const StudentExam = () => {
   };
 
   const startAIMonitoring = () => {
+    console.log('🎬 Starting AI monitoring - capturing frames every 2 seconds');
     detectionIntervalRef.current = setInterval(async () => {
-      if (!videoRef.current || !streamRef.current || !examId || !studentData) return;
+      if (!videoRef.current || !streamRef.current || !examId || !studentData) {
+        console.warn('⚠️ Cannot capture frame:', { 
+          hasVideo: !!videoRef.current, 
+          hasStream: !!streamRef.current, 
+          hasExamId: !!examId, 
+          hasStudentData: !!studentData 
+        });
+        return;
+      }
 
       try {
+        console.log('📸 Capturing frame...');
         // Capture frame from video
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
@@ -237,6 +247,7 @@ const StudentExam = () => {
         
         ctx.drawImage(videoRef.current, 0, 0);
         const snapshot = canvas.toDataURL('image/jpeg', 0.8);
+        console.log(`📷 Frame captured: ${snapshot.substring(0, 50)}... (${snapshot.length} bytes)`);
         
         // Get audio level and normalize to 0-100 scale
         let currentAudioLevel = 0;
@@ -253,17 +264,19 @@ const StudentExam = () => {
 
         // Send to backend via WebSocket if connected
         if (wsConnected) {
+          console.log(`📡 Sending frame to backend (audio: ${currentAudioLevel}%, WS connected: ${wsConnected})`);
           // Send frame to Python backend
           sendFrame(snapshot, currentAudioLevel);
 
           // Also send audio level separately
           sendAudioLevel(currentAudioLevel);
+          console.log('✅ Frame and audio sent to backend');
         } else {
           // Log warning but continue monitoring locally
-          console.warn('WebSocket not connected - attempting to reconnect');
+          console.warn('❌ WebSocket not connected - frame not sent');
         }
       } catch (error) {
-        console.error('AI monitoring error:', error);
+        console.error('❌ AI monitoring error:', error);
       }
     }, 2000);
   };
