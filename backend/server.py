@@ -237,8 +237,10 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
             # Receive frame data from client
             data = await websocket.receive_text()
             message = json.loads(data)
+            logger.info(f"📥 Received message type: {message.get('type')}")
             
             if message['type'] == 'frame':
+                logger.info(f"🎥 Processing frame from student {message.get('student_id')}")
                 # Throttle processing to every 2 seconds
                 now_ts = asyncio.get_event_loop().time()
                 if (now_ts - last_processed_time) >= FRAME_INTERVAL_SEC:
