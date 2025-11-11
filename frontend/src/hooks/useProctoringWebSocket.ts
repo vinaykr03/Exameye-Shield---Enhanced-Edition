@@ -70,13 +70,18 @@ export const useProctoringWebSocket = ({
   }, [onViolation]);
 
   const connect = useCallback(() => {
-    if (!enabled || !sessionId) return;
+    if (!enabled || !sessionId) {
+      console.log('❌ Cannot connect WebSocket:', { enabled, sessionId });
+      return;
+    }
 
     try {
-      const ws = new WebSocket(`${WS_URL}/api/ws/proctoring/${sessionId}`);
+      const wsURL = `${WS_URL}/api/ws/proctoring/${sessionId}`;
+      console.log('🔌 Attempting WebSocket connection to:', wsURL);
+      const ws = new WebSocket(wsURL);
       
       ws.onopen = () => {
-        console.log('Proctoring WebSocket connected');
+        console.log('✅ Proctoring WebSocket connected successfully!');
         setIsConnected(true);
         setReconnectAttempts(0);
         toast.success('Real-time monitoring active');
