@@ -149,15 +149,18 @@ backend:
   
   - task: "Violations API Endpoints"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Added /api/violations POST and GET endpoints for frontend to save and retrieve violations from Supabase"
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTED: Violation saving fails due to database constraints. Issues: 1) UUID format validation (exam_id/student_id must be proper UUIDs), 2) Foreign key constraint (exam_id must exist in exams table), 3) RLS policy preventing snapshot uploads, 4) Check constraint on violation_type field. Backend processes violations correctly but cannot persist to database."
   
   - task: "WebSocket for Real-time Proctoring"
     implemented: true
