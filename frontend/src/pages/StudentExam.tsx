@@ -228,13 +228,19 @@ const StudentExam = () => {
 
   const startAIMonitoring = () => {
     console.log('🎬 Starting AI monitoring - capturing frames every 2 seconds');
+    console.log('📊 Current state:', { 
+      hasVideo: !!videoRef.current, 
+      hasStream: !!streamRef.current, 
+      hasExamId: !!examId, 
+      hasStudentData: !!studentData,
+      wsConnected 
+    });
+    
     detectionIntervalRef.current = setInterval(async () => {
-      if (!videoRef.current || !streamRef.current || !examId || !studentData) {
+      if (!videoRef.current || !streamRef.current) {
         console.warn('⚠️ Cannot capture frame:', { 
           hasVideo: !!videoRef.current, 
-          hasStream: !!streamRef.current, 
-          hasExamId: !!examId, 
-          hasStudentData: !!studentData 
+          hasStream: !!streamRef.current
         });
         return;
       }
