@@ -124,7 +124,8 @@ export const useProctoringWebSocket = ({
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('❌ WebSocket connection error:', error);
+        console.error('WebSocket URL was:', `${WS_URL}/api/ws/proctoring/${sessionId}`);
         setIsConnected(false);
       };
 
