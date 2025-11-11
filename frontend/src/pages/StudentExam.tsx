@@ -82,9 +82,12 @@ const StudentExam = () => {
     const parsedData = JSON.parse(data);
     setStudentData(parsedData);
 
-    startExam(parsedData);
+    // Start exam first to get examId, then initialize monitoring
+    startExam(parsedData).then(() => {
+      console.log('✅ Exam started, initializing monitoring...');
+      initializeMonitoring();
+    });
     loadExamQuestions();
-    initializeMonitoring();
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
