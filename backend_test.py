@@ -19,7 +19,7 @@ from supabase import create_client, Client
 BACKEND_URL = "https://install-and-run-1.preview.emergentagent.com"
 WS_URL = "wss://install-and-run-1.preview.emergentagent.com"
 SUPABASE_URL = "https://ukwnvvuqmiqrjlghgxnf.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd252dnVxbWlxcmpsZ2hneG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE7NjA0MDQwMTEsImV4cCI6MjA3NTk4MDAxMX0.XhfmvtzuoEXXOrhenEFPzzVQNcIiZhcV3KAClmZnKEI"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd252dnVxbWlxcmpsZ2hneG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDQwMTEsImV4cCI6MjA3NTk4MDAxMX0.XhfmvtzuoEXXOrhenEFPzzVQNcIiZhcV3KAClmZnKEI"
 
 # Test data
 TEST_SESSION_ID = f"test-session-{uuid.uuid4()}"
