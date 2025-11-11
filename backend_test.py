@@ -62,7 +62,19 @@ def test_basic_endpoints():
     # Test health endpoint
     try:
         response = requests.get(f"{BACKEND_URL}/health", timeout=10)
-        print(f"✅ Health endpoint: {response.status_code} - {response.json()}")
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                print(f"✅ Health endpoint: {response.status_code} - {json_data}")
+                models_loaded = json_data.get('models_loaded', False)
+                if models_loaded:
+                    print("  ✅ AI models loaded successfully")
+                else:
+                    print("  ❌ AI models not loaded")
+            except:
+                print(f"❌ Health endpoint: {response.status_code} - Invalid JSON response")
+        else:
+            print(f"❌ Health endpoint: {response.status_code}")
     except Exception as e:
         print(f"❌ Health endpoint failed: {e}")
     
