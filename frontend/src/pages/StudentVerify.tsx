@@ -226,10 +226,14 @@ const StudentVerify = () => {
             return; // Block exam start
           }
           
-          // Check 3: Lighting warning (but allow to proceed)
+          // Check 3: Lighting MUST be adequate (STRICT - NO LONGER JUST WARNING)
           if (!envResult.lighting_ok) {
-            toast.warning("Poor lighting detected. Please improve lighting for better monitoring.");
-            // Allow to proceed but warn the user
+            toast.error("Poor lighting detected! Please improve lighting conditions and try verification again.", {
+              description: "Move to a well-lit area or turn on lights",
+              duration: 6000
+            });
+            setVerificationStarted(false);
+            return; // Block exam start
           }
           
         } catch (error) {
