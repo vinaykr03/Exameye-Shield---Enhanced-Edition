@@ -81,7 +81,7 @@ const StudentRegister = () => {
     }
   };
 
-  const captureFaceImage = () => {
+  const captureFaceImage = async () => {
     if (!videoRef.current) {
       toast.error("Video not ready");
       return;
@@ -106,15 +106,58 @@ const StudentRegister = () => {
     ctx.drawImage(videoRef.current, 0, 0);
     const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
     
-    setFaceImageUrl(imageDataUrl);
-    setFaceCaptured(true);
-    
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+    // STRICT VALIDATION: Use backend to validate exactly one face with MediaPipe
+    try {
+      setLoading(true);
+      toast.info("Validating face detection...", { duration: 2000 });
+      
+      const response = await fetch(`${import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:8001'}/api/environment-check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ frame: imageDataUrl })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Face validation failed');
+      }
+      
+      const result = await response.json();
+      console.log('Face validation result:', result);
+      
+      // STRICT CHECK: Exactly ONE face must be detected
+      if (!result.face_detected) {
+        toast.error("❌ No face detected! Please position your face clearly in the frame and try again.", {
+          duration: 5000
+        });
+        setLoading(false);
+        return; // Block capture
+      }
+      
+      if (result.multiple_faces_detected) {
+        toast.error("❌ Multiple faces detected! Only ONE person should be visible during registration.", {
+          duration: 5000
+        });
+        setLoading(false);
+        return; // Block capture
+      }
+      
+      // SUCCESS: Exactly one face detected
+      setFaceImageUrl(imageDataUrl);
+      setFaceCaptured(true);
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      setFaceCapture(false);
+      setLoading(false);
+      toast.success("✅ Face captured and validated successfully!");
+      
+    } catch (error) {
+      console.error('Face validation error:', error);
+      toast.error("Failed to validate face. Please try again.");
+      setLoading(false);
     }
-    
-    setFaceCapture(false);
-    toast.success("Face captured successfully!");
   };
 
   const retakeFaceImage = async () => {
