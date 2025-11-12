@@ -58,6 +58,20 @@ supabase: Client = create_client(supabase_url, supabase_key)
 # Initialize Proctoring Service
 proctoring_service = ProctoringService()
 
+# Helper function to validate and convert UUID
+def validate_uuid(value):
+    """Validate if a value is a valid UUID, return it or None"""
+    if not value:
+        return None
+    try:
+        # Try to parse as UUID
+        uuid.UUID(str(value))
+        return str(value)
+    except (ValueError, AttributeError):
+        # If it's not a valid UUID, return None
+        logger.warning(f"Invalid UUID format: {value}, using None instead")
+        return None
+
 # Active WebSocket connections
 active_connections: Dict[str, WebSocket] = {}
 
