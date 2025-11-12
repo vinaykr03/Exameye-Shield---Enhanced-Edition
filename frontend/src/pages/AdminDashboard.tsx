@@ -437,7 +437,7 @@ const AdminDashboard = () => {
                       </Badge>
                     </div>
                     <div className="mt-2">
-                      <p className="text-xs font-medium">{violation.students?.name || 'Unknown'}</p>
+                      <p className="text-xs font-medium">{violation.details?.student_name || 'Unknown Student'}</p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(violation.timestamp)}
                       </p>
