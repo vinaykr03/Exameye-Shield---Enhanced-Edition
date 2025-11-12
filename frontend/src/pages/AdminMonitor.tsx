@@ -363,7 +363,7 @@ const AdminMonitor = () => {
                         <AlertTriangle className="w-5 h-5 text-destructive mt-1" />
                         <div>
                           <p className="font-medium">
-                            {violation.exams?.students?.name || 'Unknown Student'}
+                            {violation.details?.student_name || 'Unknown Student'}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {violation.violation_type?.replace(/_/g, ' ')}
