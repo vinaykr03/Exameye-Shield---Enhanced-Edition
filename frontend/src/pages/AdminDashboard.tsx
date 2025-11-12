@@ -88,22 +88,10 @@ const AdminDashboard = () => {
 
       if (examsError) throw examsError;
 
+      // Fetch all violations - don't require foreign key joins (allow NULLs)
       const { data: violationsData } = await supabase
         .from('violations')
-        .select(`
-          *,
-          students (
-            name,
-            email
-          ),
-          exams (
-            subject_code,
-            exam_templates (
-              subject_name,
-              subject_code
-            )
-          )
-        `)
+        .select('*')
         .order('timestamp', { ascending: false });
 
       setViolations(violationsData || []);
