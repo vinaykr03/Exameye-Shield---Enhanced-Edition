@@ -111,22 +111,28 @@ const StudentRegister = () => {
       setLoading(true);
       toast.info("Validating face detection...", { duration: 2000 });
       
-      const response = await fetch(`${import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:8001'}/api/environment-check`, {
+      const apiUrl = import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:8001';
+      console.log('🔍 Sending frame to backend for validation:', apiUrl);
+      
+      const response = await fetch(`${apiUrl}/api/environment-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ frame: imageDataUrl })
+        body: JSON.stringify({ frame_base64: imageDataUrl })
       });
       
       if (!response.ok) {
-        throw new Error('Face validation failed');
+        const errorText = await response.text();
+        console.error('❌ Backend response error:', response.status, errorText);
+        throw new Error(`Face validation failed: ${response.status}`);
       }
       
       const result = await response.json();
-      console.log('Face validation result:', result);
+      console.log('✅ Face validation result:', result);
       
-      // STRICT CHECK: Exactly ONE face must be detected
+      // LENIENT CHECK: Accept if face is detected (don't require perfect centering)
       if (!result.face_detected) {
         toast.error("❌ No face detected! Please position your face clearly in the frame and try again.", {
+          description: "Make sure your face is visible and well-lit",
           duration: 5000
         });
         setLoading(false);
@@ -142,6 +148,7 @@ const StudentRegister = () => {
       }
       
       // SUCCESS: Exactly one face detected
+      console.log('✅ Face validation passed - saving image');
       setFaceImageUrl(imageDataUrl);
       setFaceCaptured(true);
       
@@ -154,8 +161,10 @@ const StudentRegister = () => {
       toast.success("✅ Face captured and validated successfully!");
       
     } catch (error) {
-      console.error('Face validation error:', error);
-      toast.error("Failed to validate face. Please try again.");
+      console.error('❌ Face validation error:', error);
+      toast.error(`Failed to validate face: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`, {
+        duration: 5000
+      });
       setLoading(false);
     }
   };
