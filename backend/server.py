@@ -424,8 +424,8 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                     # Save browser activity violation to database (NO snapshot for browser activity)
                     violation_record = {
                         "id": str(uuid.uuid4()),
-                        "exam_id": exam_id,
-                        "student_id": student_id,
+                        "exam_id": validate_uuid(exam_id),
+                        "student_id": validate_uuid(student_id),
                         "violation_type": violation_type,
                         "severity": "medium",
                         "details": {
