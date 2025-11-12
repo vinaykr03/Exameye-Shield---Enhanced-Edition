@@ -102,20 +102,32 @@ class ProctoringService:
         """
         Check if user is looking away from camera based on calibrated values
         Returns (is_looking_away, confidence_score)
+        
+        Improved logic to reduce false positives:
+        - Uses stricter thresholds
+        - Considers both pitch and yaw together
+        - Requires significant deviation from calibrated position
         """
         pitch_offset = abs(pitch - calibrated_pitch)
         yaw_offset = abs(yaw - calibrated_yaw)
         
         # Calculate confidence score based on how far the head is turned
-        # Normalize offsets to 0-1 range, then combine pitch and yaw
+        # Normalize offsets to 0-1 range
         normalized_pitch = min(pitch_offset / self.MAX_PITCH_OFFSET, 1.0)
         normalized_yaw = min(yaw_offset / self.MAX_YAW_OFFSET, 1.0)
         
-        # Use the maximum of the two offsets as the confidence score
-        confidence_score = max(normalized_pitch, normalized_yaw)
+        # Use weighted average favoring yaw (left/right is more significant than up/down)
+        # Yaw has more weight (0.7) as looking left/right is stronger indicator
+        confidence_score = (normalized_yaw * 0.7) + (normalized_pitch * 0.3)
         
-        # Only trigger if confidence meets threshold
-        is_looking_away = confidence_score >= self.LOOKING_AWAY_CONFIDENCE_THRESHOLD
+        # Only trigger if:
+        # 1. Confidence score meets threshold AND
+        # 2. At least one axis has significant deviation (not just noise)
+        significant_yaw_deviation = yaw_offset > (self.MAX_YAW_OFFSET * 0.5)  # More than 50% of max
+        significant_pitch_deviation = pitch_offset > (self.MAX_PITCH_OFFSET * 0.5)
+        
+        is_looking_away = (confidence_score >= self.LOOKING_AWAY_CONFIDENCE_THRESHOLD and 
+                          (significant_yaw_deviation or significant_pitch_deviation))
         
         return is_looking_away, confidence_score
 
