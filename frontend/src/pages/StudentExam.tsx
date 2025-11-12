@@ -295,23 +295,13 @@ const StudentExam = () => {
         // Always update audio level state for UI display (real-time update)
         setAudioLevel(currentAudioLevel);
 
-        // Send to backend via WebSocket if connected AND we have exam data
-        if (wsConnected && examId && studentData) {
-          console.log(`📡 Sending frame to backend (audio: ${currentAudioLevel}%, WS: ${wsConnected}, examId: ${examId})`);
-          // Send frame to Python backend
-          sendFrame(snapshot, currentAudioLevel);
-
-          // Also send audio level separately
-          sendAudioLevel(currentAudioLevel);
-          console.log('✅ Frame and audio sent to backend');
-        } else {
-          // Log warning with detailed state
-          console.warn('❌ Cannot send frame:', { 
-            wsConnected, 
-            hasExamId: !!examId, 
-            hasStudentData: !!studentData 
-          });
-        }
+        // Send to backend via WebSocket - sendFrame handles all connection checks internally
+        console.log(`📡 Attempting to send frame to backend (audio: ${currentAudioLevel}%)`);
+        sendFrame(snapshot, currentAudioLevel);
+        
+        // Also send audio level separately
+        sendAudioLevel(currentAudioLevel);
+        console.log('✅ Frame send attempted');
       } catch (error) {
         console.error('❌ AI monitoring error:', error);
       }
