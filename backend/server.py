@@ -308,8 +308,8 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                                 for v in result['violations']:
                                     violation_record = {
                                         "id": str(uuid.uuid4()),
-                                        "exam_id": exam_id,
-                                        "student_id": student_id,
+                                        "exam_id": validate_uuid(exam_id),
+                                        "student_id": validate_uuid(student_id),
                                         "violation_type": v.get("type"),
                                         "severity": v.get("severity"),
                                         "details": {
