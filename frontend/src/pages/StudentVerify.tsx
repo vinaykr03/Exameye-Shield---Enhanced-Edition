@@ -208,13 +208,25 @@ const StudentVerify = () => {
           setProgress(85);
           console.log('Proctoring service connected successfully');
           
-          // Check if verification passed - MUST have face detected to proceed
+          // STRICT VALIDATION - All checks must pass
+          
+          // Check 1: Microphone MUST be working
+          if (!microphoneWorking) {
+            toast.error("Microphone test failed! Please speak or make noise to test your microphone, then try verification again.", {
+              duration: 6000
+            });
+            setVerificationStarted(false);
+            return; // Block exam start
+          }
+          
+          // Check 2: Face MUST be detected to proceed
           if (!envResult.face_detected) {
             toast.error("Face not detected! Please position yourself in front of the camera and try again.");
             setVerificationStarted(false);
             return; // Block exam start
           }
           
+          // Check 3: Lighting warning (but allow to proceed)
           if (!envResult.lighting_ok) {
             toast.warning("Poor lighting detected. Please improve lighting for better monitoring.");
             // Allow to proceed but warn the user
