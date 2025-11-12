@@ -225,9 +225,12 @@ async def process_frame(request: FrameProcessRequest):
 @app.websocket("/api/ws/proctoring/{session_id}")
 async def websocket_proctoring(websocket: WebSocket, session_id: str):
     """WebSocket endpoint for real-time proctoring"""
+    print(f"🔌 WebSocket connection attempt for session: {session_id}")
+    logger.info(f"🔌 WebSocket connection attempt for session: {session_id}")
     await websocket.accept()
     active_connections[session_id] = websocket
-    logger.info(f"WebSocket connected: {session_id}")
+    print(f"✅ WebSocket connected and accepted: {session_id}")
+    logger.info(f"✅ WebSocket connected: {session_id}")
     
     try:
         # Throttle: only process a frame every 2 seconds per connection
