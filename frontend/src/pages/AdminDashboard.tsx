@@ -536,7 +536,7 @@ const AdminDashboard = () => {
                 <div className="space-y-3">
                   {violations.slice(0, 10).map((violation) => (
                     <div key={violation.id} className="text-sm border-l-2 border-red-500 pl-3 py-1">
-                      <p className="font-medium">{violation.students?.name || 'Unknown'}</p>
+                      <p className="font-medium">{violation.details?.student_name || 'Unknown Student'}</p>
                       <p className="text-muted-foreground">
                         {getViolationTypeIcon(violation.violation_type)} {violation.violation_type.replace(/_/g, ' ')}
                       </p>
