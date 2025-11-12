@@ -17,6 +17,7 @@ const StudentVerify = () => {
   });
   const [verificationStarted, setVerificationStarted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [microphoneWorking, setMicrophoneWorking] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
