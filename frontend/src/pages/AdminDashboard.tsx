@@ -151,25 +151,33 @@ const AdminDashboard = () => {
   const groupViolationsByStudent = (exams: any[], violations: any[]) => {
     const studentMap: { [key: string]: any } = {};
 
-    exams.forEach(exam => {
-      if (!exam.student_id || !exam.students) return;
+    // Group violations by student_id or by session details in violation.details
+    violations.forEach(violation => {
+      const studentId = violation.student_id || 'unknown';
+      const studentName = violation.details?.student_name || 'Unknown Student';
+      const examId = violation.exam_id || 'unknown';
       
-      const studentViolations = violations.filter(v => v.student_id === exam.student_id);
-      
-      if (studentViolations.length > 0) {
-        const violationTypes = [...new Set(studentViolations.map(v => v.violation_type))];
+      if (!studentMap[studentId]) {
+        // Try to find exam data for this student
+        const exam = exams.find(e => e.student_id === studentId);
         
-        studentMap[exam.student_id] = {
-          name: exam.students.name,
-          studentId: exam.students.student_id,
-          id: exam.student_id,
-          violationCount: studentViolations.length,
-          violationTypes,
-          violations: studentViolations,
-          subjectName: exam.exam_templates?.subject_name || 'N/A',
-          subjectCode: exam.exam_templates?.subject_code || exam.subject_code,
+        studentMap[studentId] = {
+          name: exam?.students?.name || studentName,
+          studentId: exam?.students?.student_id || studentId,
+          id: studentId,
+          violationCount: 0,
+          violationTypes: [],
+          violations: [],
+          subjectName: exam?.exam_templates?.subject_name || 'N/A',
+          subjectCode: exam?.exam_templates?.subject_code || exam?.subject_code || 'N/A',
         };
       }
+      
+      studentMap[studentId].violationCount++;
+      if (!studentMap[studentId].violationTypes.includes(violation.violation_type)) {
+        studentMap[studentId].violationTypes.push(violation.violation_type);
+      }
+      studentMap[studentId].violations.push(violation);
     });
 
     setStudentsWithViolations(Object.values(studentMap));
