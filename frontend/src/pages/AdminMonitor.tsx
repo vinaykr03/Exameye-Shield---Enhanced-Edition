@@ -129,17 +129,10 @@ const AdminMonitor = () => {
 
   const loadRecentViolations = async () => {
     try {
+      // Fetch violations directly without requiring joins (allows NULL foreign keys)
       const { data } = await supabase
         .from('violations')
-        .select(`
-          *,
-          exams (
-            students (
-              name,
-              student_id
-            )
-          )
-        `)
+        .select('*')
         .order('timestamp', { ascending: false })
         .limit(10);
 
