@@ -82,6 +82,9 @@ const StudentExam = () => {
     }
     const parsedData = JSON.parse(data);
     setStudentData(parsedData);
+    // Update the ref immediately so it's always current
+    studentNameRef.current = parsedData.name || 'Unknown Student';
+    console.log('✅ Student name loaded and saved to ref:', studentNameRef.current);
 
     // Start exam first to get examId, then initialize monitoring
     startExam(parsedData).then(() => {
