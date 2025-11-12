@@ -31,6 +31,7 @@ const StudentExam = () => {
   const streamRef = useRef<MediaStream | null>(null);
   const detectionIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const studentNameRef = useRef<string>('Unknown Student'); // Always current student name
   const analyserRef = useRef<AnalyserNode | null>(null);
 
   // WebSocket connection for Python backend
