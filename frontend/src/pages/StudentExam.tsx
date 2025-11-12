@@ -100,6 +100,20 @@ const StudentExam = () => {
       });
     }, 1000);
 
+    // Prevent back navigation during exam
+    const handleBackButton = (e: PopStateEvent) => {
+      e.preventDefault();
+      window.history.pushState(null, '', window.location.pathname);
+      toast.error("You cannot go back during the exam!", {
+        description: "Please complete or submit the exam first.",
+        duration: 4000
+      });
+    };
+
+    // Push initial state and block back button
+    window.history.pushState(null, '', window.location.pathname);
+    window.addEventListener('popstate', handleBackButton);
+
     return () => {
       clearInterval(timer);
       if (streamRef.current) {
@@ -114,6 +128,8 @@ const StudentExam = () => {
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
+      // Remove back button listener
+      window.removeEventListener('popstate', handleBackButton);
     };
   }, [navigate]);
 
