@@ -249,9 +249,15 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                 if (now_ts - last_processed_time) >= FRAME_INTERVAL_SEC:
                     last_processed_time = now_ts
                     # Process frame
-                    frame_data = base64.b64decode(message['frame'].split(',')[1] if ',' in message['frame'] else message['frame'])
-                    nparr = np.frombuffer(frame_data, np.uint8)
-                    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    try:
+                        frame_data = base64.b64decode(message['frame'].split(',')[1] if ',' in message['frame'] else message['frame'])
+                        logger.info(f"📦 Frame data decoded: {len(frame_data)} bytes")
+                        nparr = np.frombuffer(frame_data, np.uint8)
+                        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                        logger.info(f"🖼️  Frame decode result: {frame is not None}")
+                    except Exception as decode_err:
+                        logger.error(f"❌ Frame decode error: {decode_err}")
+                        frame = None
                     
                     if frame is not None:
                         logger.info(f"🔍 Frame decoded successfully: {frame.shape}, Calibration: pitch={message.get('calibrated_pitch', 0.0)}, yaw={message.get('calibrated_yaw', 0.0)}")
