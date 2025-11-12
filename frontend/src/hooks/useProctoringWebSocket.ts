@@ -176,7 +176,11 @@ export const useProctoringWebSocket = ({
         student_name: studentName,
         audio_level: audioLevel,
       };
-      console.log('✅ WebSocket is OPEN - Sending frame payload');
+      console.log('✅ WebSocket is OPEN - Sending frame payload with student_name:', studentName);
+      console.log('📦 Full payload (without frame data):', {
+        ...payload,
+        frame: `[${frameBase64?.length || 0} bytes]`
+      });
       wsRef.current.send(JSON.stringify(payload));
       console.log('✅ Frame sent successfully!');
     } else {
