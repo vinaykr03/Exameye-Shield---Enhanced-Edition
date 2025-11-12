@@ -57,8 +57,62 @@ const StudentVerify = () => {
       setChecks(prev => ({ ...prev, camera: { status: 'success', message: 'Camera connected' } }));
       setProgress(20);
 
-      // Microphone check
-      setChecks(prev => ({ ...prev, microphone: { status: 'success', message: 'Microphone connected' } }));
+      // Microphone check - Test if audio is actually working
+      setChecks(prev => ({ ...prev, microphone: { status: 'checking', message: 'Testing microphone...' } }));
+      
+      try {
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        let audioDetected = false;
+        let checkCount = 0;
+        const maxChecks = 30; // Check for 3 seconds (100ms * 30)
+        
+        // Check for audio input
+        await new Promise((resolve) => {
+          const checkAudio = () => {
+            analyser.getByteFrequencyData(dataArray);
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            
+            console.log(`🎤 Microphone test: audio level = ${average.toFixed(1)}`);
+            
+            if (average > 10) { // Threshold for detecting sound
+              audioDetected = true;
+              console.log('✅ Audio input detected!');
+              resolve(null);
+            } else {
+              checkCount++;
+              if (checkCount >= maxChecks) {
+                console.log('❌ No audio input detected after 3 seconds');
+                resolve(null);
+              } else {
+                setTimeout(checkAudio, 100);
+              }
+            }
+          };
+          checkAudio();
+        });
+        
+        audioContext.close();
+        
+        if (audioDetected) {
+          setChecks(prev => ({ ...prev, microphone: { status: 'success', message: 'Microphone working - Audio detected' } }));
+          toast.success("Microphone is working properly!");
+        } else {
+          setChecks(prev => ({ ...prev, microphone: { status: 'warning', message: 'No audio detected - Please speak or check microphone' } }));
+          toast.warning("No audio detected from microphone. Please speak to test or check your microphone settings.", {
+            duration: 5000
+          });
+        }
+      } catch (audioError) {
+        console.error('Audio test error:', audioError);
+        setChecks(prev => ({ ...prev, microphone: { status: 'warning', message: 'Microphone connected but not tested' } }));
+      }
+      
       setProgress(40);
 
       // Step 2: Wait for camera to be ready
