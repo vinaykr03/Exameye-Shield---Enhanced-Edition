@@ -47,19 +47,19 @@ const Index = () => {
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-2 text-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                  Quick registration with auto-generated ID
+                  Verification with subject code given by admin
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                  Environment verification before exam
+                  Face and environment verification before exam
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                  Real-time webcam monitoring
+                  Real-time AI-powered monitoring
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                  Secure exam environment
+                  Violation detection and alerts
                 </li>
               </ul>
               <Button 
