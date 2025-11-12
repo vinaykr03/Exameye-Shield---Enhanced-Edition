@@ -161,7 +161,8 @@ export const useProctoringWebSocket = ({
       wsStateString: wsRef.current ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][wsRef.current.readyState] : 'NO_WS',
       frameSize: frameBase64?.length,
       examId,
-      studentId
+      studentId,
+      studentName: studentName || '(EMPTY - THIS IS THE PROBLEM!)'
     });
     
     if (wsRef.current?.readyState === WebSocket.OPEN) {
