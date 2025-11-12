@@ -15,8 +15,8 @@ const Index = () => {
             <Shield className="w-7 h-7 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">ExamEye Shield</h1>
-            <p className="text-sm text-muted-foreground">Automated Exam Proctoring System</p>
+            <h1 className="text-2xl font-extrabold text-foreground tracking-tight" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>ExamEye Shield</h1>
+            <p className="text-sm text-muted-foreground font-medium" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>Automated Exam Proctoring System</p>
           </div>
         </div>
       </header>
