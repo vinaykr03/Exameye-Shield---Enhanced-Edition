@@ -336,6 +336,12 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                                     }
                                 })
                                 logger.info(f"🚨 Violation alert sent to frontend: {v.get('type')}")
+                    else:
+                        logger.error("❌ Frame is None - could not decode image data")
+                        await websocket.send_json({
+                            'type': 'error',
+                            'data': {'message': 'Failed to decode frame image'}
+                        })
                 else:
                     # Optionally inform client that frame was skipped due to throttle
                     await websocket.send_json({
