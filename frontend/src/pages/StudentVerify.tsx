@@ -102,16 +102,19 @@ const StudentVerify = () => {
         
         if (audioDetected) {
           setChecks(prev => ({ ...prev, microphone: { status: 'success', message: 'Microphone working - Audio detected' } }));
+          setMicrophoneWorking(true);
           toast.success("Microphone is working properly!");
         } else {
-          setChecks(prev => ({ ...prev, microphone: { status: 'warning', message: 'No audio detected - Please speak or check microphone' } }));
-          toast.warning("No audio detected from microphone. Please speak to test or check your microphone settings.", {
-            duration: 5000
+          setChecks(prev => ({ ...prev, microphone: { status: 'error', message: 'No audio detected - Please speak or check microphone' } }));
+          setMicrophoneWorking(false);
+          toast.error("Microphone test failed! No audio detected. Please speak or make noise to test your microphone.", {
+            duration: 6000
           });
         }
       } catch (audioError) {
         console.error('Audio test error:', audioError);
-        setChecks(prev => ({ ...prev, microphone: { status: 'warning', message: 'Microphone connected but not tested' } }));
+        setChecks(prev => ({ ...prev, microphone: { status: 'error', message: 'Microphone test failed' } }));
+        setMicrophoneWorking(false);
       }
       
       setProgress(40);
