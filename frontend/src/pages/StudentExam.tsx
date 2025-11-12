@@ -219,7 +219,26 @@ const StudentExam = () => {
         setCalibratedYaw(yaw);
       }
 
-      startAIMonitoring();
+      // Wait for WebSocket connection before starting AI monitoring
+      console.log('⏳ Waiting for WebSocket connection before starting AI monitoring...');
+      const maxWaitTime = 10000; // 10 seconds max wait
+      const checkInterval = 100; // Check every 100ms
+      let elapsedTime = 0;
+      
+      const waitForConnection = setInterval(() => {
+        elapsedTime += checkInterval;
+        console.log(`🔍 Checking WebSocket status: wsConnected=${wsConnected}, examId=${!!examId}, studentData=${!!studentData}`);
+        
+        if (wsConnected && examId && studentData) {
+          console.log('✅ WebSocket connected and ready! Starting AI monitoring...');
+          clearInterval(waitForConnection);
+          startAIMonitoring();
+        } else if (elapsedTime >= maxWaitTime) {
+          console.warn('⚠️ WebSocket connection timeout - starting AI monitoring anyway');
+          clearInterval(waitForConnection);
+          startAIMonitoring();
+        }
+      }, checkInterval);
     } catch (error) {
       console.error('Camera error:', error);
       toast.error("Camera access required");
