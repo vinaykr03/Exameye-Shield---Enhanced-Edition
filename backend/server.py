@@ -169,6 +169,7 @@ async def check_environment(request: EnvironmentCheckRequest):
                 lighting_ok=False,
                 face_detected=False,
                 face_centered=False,
+                multiple_faces_detected=False,
                 message="Invalid frame data"
             )
         
