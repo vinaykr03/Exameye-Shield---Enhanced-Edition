@@ -155,6 +155,15 @@ export const useProctoringWebSocket = ({
   }, [enabled, sessionId, reconnectAttempts, WS_URL]);
 
   const sendFrame = useCallback((frameBase64: string, audioLevel?: number) => {
+    console.log('🔍 sendFrame called with:', {
+      hasWsRef: !!wsRef.current,
+      wsState: wsRef.current?.readyState,
+      wsStateString: wsRef.current ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][wsRef.current.readyState] : 'NO_WS',
+      frameSize: frameBase64?.length,
+      examId,
+      studentId
+    });
+    
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       const payload = {
         type: 'frame',
@@ -166,17 +175,15 @@ export const useProctoringWebSocket = ({
         student_name: studentName,
         audio_level: audioLevel,
       };
-      console.log('📤 Sending frame to backend:', {
-        type: payload.type,
-        frameSize: frameBase64.length,
-        audioLevel,
-        examId,
-        studentId,
-        wsState: wsRef.current.readyState
-      });
+      console.log('✅ WebSocket is OPEN - Sending frame payload');
       wsRef.current.send(JSON.stringify(payload));
+      console.log('✅ Frame sent successfully!');
     } else {
-      console.error('❌ Cannot send frame - WebSocket not open. State:', wsRef.current?.readyState);
+      console.error('❌ CANNOT send frame - WebSocket NOT open!', {
+        wsExists: !!wsRef.current,
+        state: wsRef.current?.readyState,
+        stateString: wsRef.current ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][wsRef.current.readyState] : 'NO_WS'
+      });
     }
   }, [calibratedPitch, calibratedYaw, examId, studentId, studentName]);
 
