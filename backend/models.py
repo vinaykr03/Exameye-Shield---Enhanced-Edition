@@ -113,6 +113,7 @@ class EnvironmentCheck(BaseModel):
     lighting_ok: bool
     face_detected: bool
     face_centered: bool
+    multiple_faces_detected: bool = False  # NEW: Check for multiple faces
     message: str
 
 class EnvironmentCheckRequest(BaseModel):
