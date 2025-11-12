@@ -295,13 +295,14 @@ const StudentExam = () => {
         // Always update audio level state for UI display (real-time update)
         setAudioLevel(currentAudioLevel);
 
-        // Send to backend via WebSocket - sendFrame handles all connection checks internally
-        console.log(`📡 Attempting to send frame to backend (audio: ${currentAudioLevel}%)`);
-        sendFrame(snapshot, currentAudioLevel);
+        // Send to backend via WebSocket - pass current studentData.name to ensure it's not empty
+        const currentStudentName = studentData?.name || 'Unknown Student';
+        console.log(`📡 Attempting to send frame to backend (audio: ${currentAudioLevel}%, student: ${currentStudentName})`);
+        sendFrame(snapshot, currentAudioLevel, currentStudentName);
         
         // Also send audio level separately
         sendAudioLevel(currentAudioLevel);
-        console.log('✅ Frame send attempted');
+        console.log('✅ Frame send attempted with student name:', currentStudentName);
       } catch (error) {
         console.error('❌ AI monitoring error:', error);
       }
