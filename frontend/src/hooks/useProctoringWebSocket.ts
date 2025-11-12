@@ -154,7 +154,10 @@ export const useProctoringWebSocket = ({
     }
   }, [enabled, sessionId, reconnectAttempts, WS_URL]);
 
-  const sendFrame = useCallback((frameBase64: string, audioLevel?: number) => {
+  const sendFrame = useCallback((frameBase64: string, audioLevel?: number, overrideStudentName?: string) => {
+    // Use override if provided, otherwise fall back to hook parameter
+    const currentStudentName = overrideStudentName || studentName;
+    
     console.log('🔍 sendFrame called with:', {
       hasWsRef: !!wsRef.current,
       wsState: wsRef.current?.readyState,
@@ -162,7 +165,8 @@ export const useProctoringWebSocket = ({
       frameSize: frameBase64?.length,
       examId,
       studentId,
-      studentName: studentName || '(EMPTY - THIS IS THE PROBLEM!)'
+      studentName: currentStudentName || '(EMPTY - THIS IS THE PROBLEM!)',
+      overrideProvided: !!overrideStudentName
     });
     
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -173,10 +177,10 @@ export const useProctoringWebSocket = ({
         calibrated_yaw: calibratedYaw,
         exam_id: examId,
         student_id: studentId,
-        student_name: studentName,
+        student_name: currentStudentName,
         audio_level: audioLevel,
       };
-      console.log('✅ WebSocket is OPEN - Sending frame payload with student_name:', studentName);
+      console.log('✅ WebSocket is OPEN - Sending frame payload with student_name:', currentStudentName);
       console.log('📦 Full payload (without frame data):', {
         ...payload,
         frame: `[${frameBase64?.length || 0} bytes]`
