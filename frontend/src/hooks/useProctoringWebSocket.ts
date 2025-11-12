@@ -233,11 +233,17 @@ export const useProctoringWebSocket = ({
     return () => clearInterval(interval);
   }, [isConnected]);
 
-  // Connect on mount
+  // Connect on mount and when enabled/sessionId changes
   useEffect(() => {
-    connect();
+    console.log('🔄 WebSocket useEffect triggered:', { enabled, sessionId, hasSessionId: !!sessionId });
+    if (enabled && sessionId) {
+      console.log('✅ Conditions met, attempting connection');
+      connect();
+    } else {
+      console.log('❌ Cannot connect yet:', { enabled, sessionId });
+    }
     return () => disconnect();
-  }, [connect, disconnect]);
+  }, [enabled, sessionId, connect, disconnect]);
 
   return {
     isConnected,
