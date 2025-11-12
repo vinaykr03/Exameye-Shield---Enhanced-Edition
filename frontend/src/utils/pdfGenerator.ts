@@ -202,13 +202,14 @@ export class PDFGenerator {
   }
 
   async exportToCSV(violations: ViolationData[]): Promise<string> {
-    const headers = ['Timestamp', 'Violation Type', 'Severity', 'Subject', 'Details', 'Evidence Image URL', 'Has Evidence'];
+    const headers = ['Timestamp', 'Student Name', 'Violation Type', 'Severity', 'Details', 'Confidence', 'Evidence Image URL', 'Has Evidence'];
     const rows = violations.map(v => [
       new Date(v.timestamp).toLocaleString(),
+      v.details?.student_name || 'Unknown Student',
       v.violation_type.replace(/_/g, ' '),
       v.severity,
-      (v as any).exams?.exam_templates?.subject_name || 'N/A',
       v.details?.message || '',
+      v.details?.confidence ? `${(v.details.confidence * 100).toFixed(1)}%` : 'N/A',
       v.image_url || 'No evidence captured',
       v.image_url ? 'Yes' : 'No'
     ]);
