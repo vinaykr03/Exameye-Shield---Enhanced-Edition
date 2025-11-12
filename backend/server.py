@@ -382,38 +382,58 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                         'timestamp': datetime.utcnow().isoformat()
                     }
                 })
-                # Record a violation if audio exceeds threshold
+                # Record a violation if audio exceeds threshold (adjusted to be more sensitive)
                 try:
-                    if audio_level >= 30:
+                    AUDIO_THRESHOLD = 40  # 40% threshold for excessive noise
+                    if audio_level >= AUDIO_THRESHOLD:
                         exam_id = message.get('exam_id')
                         student_id = message.get('student_id')
                         student_name = message.get('student_name')
+                        
+                        # Determine severity based on audio level
+                        if audio_level >= 70:
+                            severity = "high"
+                            severity_msg = "Very loud background noise"
+                        elif audio_level >= 55:
+                            severity = "medium"
+                            severity_msg = "Loud background noise"
+                        else:
+                            severity = "low"
+                            severity_msg = "Moderate background noise"
+                        
+                        logger.info(f"🔊 Audio violation detected: level={audio_level}%, threshold={AUDIO_THRESHOLD}%, severity={severity}")
+                        
                         violation_record = {
                             "id": str(uuid.uuid4()),
                             "exam_id": validate_uuid(exam_id),
                             "student_id": validate_uuid(student_id),
                             "violation_type": "excessive_noise",
-                            "severity": "medium",
+                            "severity": severity,
                             "details": {
-                                "message": f"Audio level {audio_level:.0f}% over threshold",
+                                "message": f"{severity_msg} detected - Audio level: {audio_level:.0f}% (Threshold: {AUDIO_THRESHOLD}%)",
+                                "audio_level": audio_level,
+                                "threshold": AUDIO_THRESHOLD,
                                 "session_id": session_id,
                                 "student_name": student_name,
                             },
-                            "image_url": None,
+                            "image_url": None,  # No snapshot for audio violations
                             "timestamp": datetime.utcnow().isoformat()
                         }
                         supabase.table('violations').insert(violation_record).execute()
+                        logger.info(f"✅ Audio violation saved: {severity_msg} - {audio_level}%")
+                        
                         await websocket.send_json({
                             'type': 'violation',
                             'data': {
                                 'type': 'excessive_noise',
-                                'severity': 'medium',
-                                'message': 'Excessive background noise detected',
+                                'severity': severity,
+                                'message': f'{severity_msg} - {audio_level:.0f}%',
+                                'audio_level': audio_level,
                                 'timestamp': datetime.utcnow().isoformat()
                             }
                         })
                 except Exception as e:
-                    logger.error(f"Audio violation insert failed: {e}")
+                    logger.error(f"❌ Audio violation insert failed: {e}")
                     
             elif message['type'] == 'browser_activity':
                 # Handle browser activity violations (tab switch, copy/paste)
