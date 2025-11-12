@@ -175,10 +175,18 @@ async def check_environment(request: EnvironmentCheckRequest):
         # Check environment
         result = proctoring_service.check_environment(frame)
         
+        # Also check for multiple faces using process_frame
+        detection_result = proctoring_service.process_frame(
+            frame=frame,
+            calibrated_pitch=0.0,
+            calibrated_yaw=0.0
+        )
+        
         return EnvironmentCheck(
             lighting_ok=result['lighting_ok'],
             face_detected=result['face_detected'],
             face_centered=result['face_centered'],
+            multiple_faces_detected=detection_result.get('multiple_faces', False),
             message=result['message']
         )
     except Exception as e:
