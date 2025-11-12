@@ -100,14 +100,65 @@ const StudentExam = () => {
       });
     }, 1000);
 
-    // Prevent back navigation during exam
-    const handleBackButton = (e: PopStateEvent) => {
+    // Auto-submit exam and redirect to homepage if back button pressed
+    const handleBackButton = async (e: PopStateEvent) => {
       e.preventDefault();
-      window.history.pushState(null, '', window.location.pathname);
-      toast.error("You cannot go back during the exam!", {
-        description: "Please complete or submit the exam first.",
-        duration: 4000
+      
+      // Show warning toast
+      toast.error("Back button pressed! Auto-submitting exam...", {
+        description: "Redirecting to homepage",
+        duration: 3000
       });
+      
+      // Stop all media streams
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      // Clear intervals
+      if (detectionIntervalRef.current) {
+        clearInterval(detectionIntervalRef.current);
+      }
+      if ((window as any).audioMonitorInterval) {
+        clearInterval((window as any).audioMonitorInterval);
+      }
+      
+      // Auto-submit the exam
+      if (examId && studentData) {
+        try {
+          // Save current answers
+          const promises = Object.entries(answers).map(([questionNum, answer]) =>
+            supabase
+              .from('exam_answers')
+              .upsert({
+                exam_id: examId,
+                student_id: studentData.id,
+                question_number: parseInt(questionNum),
+                answer: answer,
+                updated_at: new Date().toISOString()
+              })
+          );
+          await Promise.all(promises);
+          
+          // Mark exam as completed
+          await supabase
+            .from('exams')
+            .update({ 
+              status: 'completed',
+              completed_at: new Date().toISOString()
+            })
+            .eq('id', examId);
+          
+          console.log('✅ Exam auto-submitted due to back navigation');
+        } catch (error) {
+          console.error('Error auto-submitting exam:', error);
+        }
+      }
+      
+      // Redirect to homepage
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 1000);
     };
 
     // Push initial state and block back button
