@@ -125,6 +125,58 @@ async def health_check():
         "models_loaded": proctoring_service.yolo_model is not None
     }
 
+@app.post("/api/grade-exam")
+async def grade_exam(request: dict):
+    """
+    Auto-grade exam by comparing student answers with correct answers
+    Request: {
+        exam_id: str,
+        student_id: str,
+        answers: [{question_number: int, answer: str}]
+    }
+    """
+    try:
+        exam_id = request.get('exam_id')
+        student_id = request.get('student_id')
+        student_answers = request.get('answers', [])
+        
+        logger.info(f"📝 Grading exam: exam_id={exam_id}, student_id={student_id}, answers={len(student_answers)}")
+        
+        # Get questions with correct answers from Supabase
+        exam_response = supabase.table('exams').select('exam_template_id').eq('id', exam_id).single().execute()
+        exam_template_id = exam_response.data['exam_template_id']
+        
+        questions_response = supabase.table('questions').select('question_number, correct_answer, points').eq('exam_template_id', exam_template_id).execute()
+        questions = questions_response.data
+        
+        # Grade the exam
+        total_score, max_score, results = grading_service.grade_exam(student_answers, questions)
+        percentage = grading_service.calculate_percentage(total_score, max_score)
+        grade_letter = grading_service.get_grade_letter(percentage)
+        
+        # Update exam with score
+        supabase.table('exams').update({
+            'total_score': total_score,
+            'max_score': max_score,
+            'graded': True,
+            'graded_at': datetime.utcnow().isoformat()
+        }).eq('id', exam_id).execute()
+        
+        logger.info(f"✅ Grading complete: {total_score}/{max_score} ({percentage}%) - Grade: {grade_letter}")
+        
+        return {
+            'success': True,
+            'total_score': total_score,
+            'max_score': max_score,
+            'percentage': percentage,
+            'grade_letter': grade_letter,
+            'results': results
+        }
+    
+    except Exception as e:
+        logger.error(f"❌ Grading error: {e}")
+        return {'success': False, 'error': str(e)}
+
 @app.post("/api/calibrate", response_model=CalibrationResponse)
 async def calibrate(request: CalibrationRequest):
     """Calibrate head pose for a student"""
