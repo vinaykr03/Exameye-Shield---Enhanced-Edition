@@ -24,6 +24,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 from proctoring_service import ProctoringService
+from grading_service import grading_service
 from models import (
     FrameProcessRequest,
     FrameProcessResponse,
