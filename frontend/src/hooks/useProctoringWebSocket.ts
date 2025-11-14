@@ -210,6 +210,8 @@ export const useProctoringWebSocket = ({
         exam_id: examId,
         student_id: studentId,
         student_name: studentName,
+        subject_code: subjectCode,
+        subject_name: subjectName,
       }));
     }
   }, [examId, studentId, studentName]);
