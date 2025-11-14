@@ -54,7 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_students_face_image ON students(face_image_url) W
 -- =====================================================
 
 -- Summary:
--- 1. questions table: Added correct_answer (A/B/C/D), points (default 1)
+-- 1. exam_questions table: Added correct_answer (A/B/C/D), points (default 1)
 -- 2. exams table: Added total_score, max_score, graded, graded_at
 -- 3. students table: Added face_image_url
 -- 4. Created performance indexes
