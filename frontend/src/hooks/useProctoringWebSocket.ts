@@ -40,6 +40,8 @@ export const useProctoringWebSocket = ({
   examId,
   studentId,
   studentName,
+  subjectCode,
+  subjectName,
   calibratedPitch,
   calibratedYaw,
   onViolation,
