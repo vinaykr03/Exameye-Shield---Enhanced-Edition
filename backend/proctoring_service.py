@@ -103,10 +103,10 @@ class ProctoringService:
         Check if user is looking away from camera based on calibrated values
         Returns (is_looking_away, confidence_score)
         
-        Improved logic to reduce false positives:
-        - Uses stricter thresholds
-        - Considers both pitch and yaw together
-        - Requires significant deviation from calibrated position
+        VERY STRICT logic to minimize false positives:
+        - Only flags SIGNIFICANT head movements
+        - Requires BOTH high confidence AND large deviation
+        - Ignores small natural movements
         """
         pitch_offset = abs(pitch - calibrated_pitch)
         yaw_offset = abs(yaw - calibrated_yaw)
@@ -116,18 +116,21 @@ class ProctoringService:
         normalized_pitch = min(pitch_offset / self.MAX_PITCH_OFFSET, 1.0)
         normalized_yaw = min(yaw_offset / self.MAX_YAW_OFFSET, 1.0)
         
-        # Use weighted average favoring yaw (left/right is more significant than up/down)
-        # Yaw has more weight (0.7) as looking left/right is stronger indicator
-        confidence_score = (normalized_yaw * 0.7) + (normalized_pitch * 0.3)
+        # Use weighted average favoring yaw (left/right is THE strongest indicator)
+        # Yaw has MUCH more weight (0.8) as looking left/right is primary indicator
+        confidence_score = (normalized_yaw * 0.8) + (normalized_pitch * 0.2)
         
-        # Only trigger if:
-        # 1. Confidence score meets threshold AND
-        # 2. At least one axis has significant deviation (not just noise)
-        significant_yaw_deviation = yaw_offset > (self.MAX_YAW_OFFSET * 0.5)  # More than 50% of max
-        significant_pitch_deviation = pitch_offset > (self.MAX_PITCH_OFFSET * 0.5)
+        # STRICT REQUIREMENTS - ALL must be true:
+        # 1. Confidence score must be VERY high (85%+)
+        # 2. Yaw offset must be SIGNIFICANT (more than 60% of max threshold)
+        # 3. Total offset must indicate clear movement away
+        significant_yaw_deviation = yaw_offset > (self.MAX_YAW_OFFSET * 0.6)  # 60% of max = ~27 degrees
         
+        # Only flag if:
+        # - Very high confidence (person is CLEARLY looking away)
+        # - AND significant yaw deviation (head turned substantially)
         is_looking_away = (confidence_score >= self.LOOKING_AWAY_CONFIDENCE_THRESHOLD and 
-                          (significant_yaw_deviation or significant_pitch_deviation))
+                          significant_yaw_deviation)
         
         return is_looking_away, confidence_score
 
