@@ -439,6 +439,9 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                                 "threshold": AUDIO_THRESHOLD,
                                 "session_id": session_id,
                                 "student_name": student_name,
+                                "student_id": student_id,
+                                "subject_code": subject_code,
+                                "subject_name": subject_name,
                             },
                             "image_url": None,  # No snapshot for audio violations
                             "timestamp": datetime.utcnow().isoformat()
