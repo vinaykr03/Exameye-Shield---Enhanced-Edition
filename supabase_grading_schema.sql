@@ -1,15 +1,15 @@
 -- =====================================================
--- PART 2: ADD GRADING COLUMNS TO QUESTIONS TABLE
+-- PART 2: ADD GRADING COLUMNS TO EXAM_QUESTIONS TABLE
 -- =====================================================
 
--- Add correct_answer and points columns to questions table
-ALTER TABLE questions 
+-- Add correct_answer and points columns to exam_questions table
+ALTER TABLE exam_questions 
 ADD COLUMN IF NOT EXISTS correct_answer VARCHAR(1) CHECK (correct_answer IN ('A', 'B', 'C', 'D')),
 ADD COLUMN IF NOT EXISTS points INTEGER DEFAULT 1;
 
 -- Add comment for documentation
-COMMENT ON COLUMN questions.correct_answer IS 'The correct answer option (A, B, C, or D)';
-COMMENT ON COLUMN questions.points IS 'Points awarded for this question (default: 1)';
+COMMENT ON COLUMN exam_questions.correct_answer IS 'The correct answer option (A, B, C, or D)';
+COMMENT ON COLUMN exam_questions.points IS 'Points awarded for this question (default: 1)';
 
 -- =====================================================
 -- PART 3: ADD MARKS AND SCORE TO EXAMS TABLE
