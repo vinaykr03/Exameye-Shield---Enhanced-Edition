@@ -146,7 +146,7 @@ async def grade_exam(request: dict):
         exam_response = supabase.table('exams').select('exam_template_id').eq('id', exam_id).single().execute()
         exam_template_id = exam_response.data['exam_template_id']
         
-        questions_response = supabase.table('questions').select('question_number, correct_answer, points').eq('exam_template_id', exam_template_id).execute()
+        questions_response = supabase.table('exam_questions').select('question_number, correct_answer, points').eq('exam_template_id', exam_template_id).execute()
         questions = questions_response.data
         
         # Grade the exam
