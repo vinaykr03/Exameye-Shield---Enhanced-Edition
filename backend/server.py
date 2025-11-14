@@ -339,6 +339,9 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                                             "confidence": v.get("confidence"),
                                             "session_id": session_id,
                                             "student_name": student_name,
+                                            "student_id": student_id,
+                                            "subject_code": subject_code,
+                                            "subject_name": subject_name,
                                         },
                                         "image_url": image_url,
                                         "timestamp": datetime.utcnow().isoformat()
