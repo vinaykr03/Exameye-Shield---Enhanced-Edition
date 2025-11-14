@@ -200,7 +200,7 @@ export const useProctoringWebSocket = ({
         stateString: wsRef.current ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][wsRef.current.readyState] : 'NO_WS'
       });
     }
-  }, [calibratedPitch, calibratedYaw, examId, studentId, studentName]);
+  }, [calibratedPitch, calibratedYaw, examId, studentId, studentName, subjectCode, subjectName]);
 
   const sendAudioLevel = useCallback((audioLevel: number) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
