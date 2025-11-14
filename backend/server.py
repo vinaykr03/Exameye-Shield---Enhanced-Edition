@@ -411,6 +411,8 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                         exam_id = message.get('exam_id')
                         student_id = message.get('student_id')
                         student_name = message.get('student_name')
+                        subject_code = message.get('subject_code', '')
+                        subject_name = message.get('subject_name', '')
                         
                         # Determine severity based on audio level
                         if audio_level >= 70:
