@@ -214,7 +214,7 @@ export const useProctoringWebSocket = ({
         subject_name: subjectName,
       }));
     }
-  }, [examId, studentId, studentName]);
+  }, [examId, studentId, studentName, subjectCode, subjectName]);
 
   const sendBrowserActivity = useCallback((violationType: string, message: string) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -233,7 +233,7 @@ export const useProctoringWebSocket = ({
     } else {
       console.error('❌ Cannot send browser activity - WebSocket not open. State:', wsRef.current?.readyState);
     }
-  }, [examId, studentId, studentName]);
+  }, [examId, studentId, studentName, subjectCode, subjectName]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
