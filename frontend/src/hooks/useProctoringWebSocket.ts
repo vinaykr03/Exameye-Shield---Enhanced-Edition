@@ -225,6 +225,8 @@ export const useProctoringWebSocket = ({
         exam_id: examId,
         student_id: studentId,
         student_name: studentName,
+        subject_code: subjectCode,
+        subject_name: subjectName,
       };
       console.log('📡 Sending browser activity to backend:', payload);
       wsRef.current.send(JSON.stringify(payload));
