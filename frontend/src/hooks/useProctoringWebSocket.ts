@@ -182,6 +182,8 @@ export const useProctoringWebSocket = ({
         exam_id: examId,
         student_id: studentId,
         student_name: currentStudentName,
+        subject_code: subjectCode,
+        subject_name: subjectName,
         audio_level: audioLevel,
       };
       console.log('✅ WebSocket is OPEN - Sending frame payload with student_name:', currentStudentName);
