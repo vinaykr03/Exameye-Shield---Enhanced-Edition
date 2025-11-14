@@ -27,6 +27,8 @@ interface UseProctoringWebSocketOptions {
   examId: string;
   studentId: string;
   studentName: string;
+  subjectCode: string;
+  subjectName: string;
   calibratedPitch: number;
   calibratedYaw: number;
   onViolation: (violation: ViolationData) => void;
