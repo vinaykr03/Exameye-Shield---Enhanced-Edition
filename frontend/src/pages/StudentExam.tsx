@@ -519,6 +519,9 @@ const StudentExam = () => {
     if (!examId || !studentData) return;
 
     try {
+      toast.info("Submitting and grading your exam...");
+      
+      // 1. Save all answers
       const promises = Object.entries(answers).map(([questionNum, answer]) =>
         supabase
           .from('exam_answers')
@@ -533,6 +536,7 @@ const StudentExam = () => {
 
       await Promise.all(promises);
 
+      // 2. Mark exam as completed
       await supabase
         .from('exams')
         .update({ 
@@ -541,13 +545,42 @@ const StudentExam = () => {
         })
         .eq('id', examId);
 
-      toast.success("Exam submitted!");
+      // 3. Auto-grade the exam
+      const backendUrl = import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:8001';
+      const gradeResponse = await fetch(`${backendUrl}/api/grade-exam`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exam_id: examId,
+          student_id: studentData.id,
+          answers: Object.entries(answers).map(([questionNum, answer]) => ({
+            question_number: parseInt(questionNum),
+            answer: answer
+          }))
+        })
+      });
+
+      const gradeData = await gradeResponse.json();
       
+      if (gradeData.success) {
+        // Show results immediately
+        toast.success(`Exam submitted and graded!`, {
+          description: `Score: ${gradeData.total_score}/${gradeData.max_score} (${gradeData.percentage}%) - Grade: ${gradeData.grade_letter}`,
+          duration: 10000
+        });
+        
+        console.log('📊 Grading Results:', gradeData);
+      } else {
+        toast.warning("Exam submitted but grading failed. Admin will grade manually.");
+      }
+      
+      // Stop camera
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
 
-      setTimeout(() => navigate('/'), 2000);
+      // Redirect after showing results
+      setTimeout(() => navigate('/'), 3000);
     } catch (error) {
       console.error('Error submitting:', error);
       toast.error("Failed to submit");
