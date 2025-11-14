@@ -16,7 +16,8 @@ export class PDFGenerator {
     studentId: string,
     violations: ViolationData[],
     subjectName?: string,
-    subjectCode?: string
+    subjectCode?: string,
+    examScore?: { total_score: number; max_score: number; percentage: number; grade_letter: string }
   ): Promise<string> {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -24,22 +25,43 @@ export class PDFGenerator {
     // Header
     pdf.setFontSize(20);
     pdf.setTextColor(220, 38, 38);
-    pdf.text('Student Violation Report', pageWidth / 2, 20, { align: 'center' });
+    pdf.text('Student Exam Report', pageWidth / 2, 20, { align: 'center' });
     
-    // Student Info
+    // Student Info Section
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
-    pdf.text(`Student ID: ${studentId}`, 20, 40);
-    pdf.text(`Student Name: ${studentName}`, 20, 48);
+    let yPos = 40;
+    
+    pdf.text(`Student ID: ${studentId || 'N/A'}`, 20, yPos);
+    yPos += 8;
+    pdf.text(`Student Name: ${studentName}`, 20, yPos);
+    yPos += 8;
+    
     if (subjectName && subjectCode) {
-      pdf.text(`Subject: ${subjectName} (${subjectCode})`, 20, 56);
-      pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 64);
-    } else {
-      pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 56);
+      pdf.text(`Subject: ${subjectName} (${subjectCode})`, 20, yPos);
+      yPos += 8;
     }
     
+    // Exam Score Section (if available)
+    if (examScore) {
+      pdf.setFontSize(14);
+      pdf.setTextColor(34, 139, 34); // Green color for score
+      pdf.text('Exam Results:', 20, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Score: ${examScore.total_score}/${examScore.max_score} (${examScore.percentage}%)`, 20, yPos);
+      yPos += 8;
+      pdf.text(`Grade: ${examScore.grade_letter}`, 20, yPos);
+      yPos += 10;
+    }
+    
+    pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, yPos);
+    yPos += 5;
+    
     // Separator
-    const separatorY = subjectName ? 70 : 62;
+    const separatorY = yPos;
     pdf.setLineWidth(0.5);
     pdf.setDrawColor(220, 38, 38);
     pdf.line(20, separatorY, pageWidth - 20, separatorY);
