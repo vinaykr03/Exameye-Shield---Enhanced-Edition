@@ -40,6 +40,8 @@ const StudentExam = () => {
     examId: examId || '',
     studentId: studentData?.id || '',
     studentName: studentData?.name || '',
+    subjectCode: studentData?.subjectCode || '',
+    subjectName: studentData?.subjectName || studentData?.subjectCode || '',
     calibratedPitch,
     calibratedYaw,
     onViolation: async (violation) => {
