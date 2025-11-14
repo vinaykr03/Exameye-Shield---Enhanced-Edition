@@ -44,13 +44,13 @@ class ProctoringService:
             (150.0, -150.0, -125.0)
         ], dtype=np.float64)
         
-        # Thresholds (adjusted to reduce false positives - more lenient)
-        self.MAX_YAW_OFFSET = 30   # Degrees - head turning left/right (increased tolerance)
-        self.MAX_PITCH_OFFSET = 25  # Degrees - head tilting up/down (increased tolerance)
+        # Thresholds (STRICT - Only flag significant head turns)
+        self.MAX_YAW_OFFSET = 45   # Degrees - head turning left/right (more lenient - only flag significant turns)
+        self.MAX_PITCH_OFFSET = 35  # Degrees - head tilting up/down (more lenient - only flag significant tilts)
         
-        # Looking away confidence thresholds (more strict to reduce false positives)
-        self.LOOKING_AWAY_CONFIDENCE_THRESHOLD = 0.75  # Must be significantly looking away
-        self.LOOKING_AWAY_SEVERITY_THRESHOLD = 0.90    # Very high threshold for "clearly" looking away
+        # Looking away confidence thresholds (VERY STRICT to minimize false positives)
+        self.LOOKING_AWAY_CONFIDENCE_THRESHOLD = 0.85  # Must be VERY clearly looking away
+        self.LOOKING_AWAY_SEVERITY_THRESHOLD = 0.95    # Almost certain they're looking away
         
         # Detection confidence thresholds (optimized for real-time)
         self.OBJECT_CONFIDENCE_THRESHOLD = 0.3  # Lowered for better detection
