@@ -308,7 +308,9 @@ async def websocket_proctoring(websocket: WebSocket, session_id: str):
                             exam_id = message.get('exam_id')
                             student_id = message.get('student_id')
                             student_name = message.get('student_name')
-                            logger.info(f"📋 Extracted from message: exam_id={exam_id}, student_id={student_id}, student_name='{student_name}'")
+                            subject_code = message.get('subject_code', '')
+                            subject_name = message.get('subject_name', '')
+                            logger.info(f"📋 Extracted from message: exam_id={exam_id}, student_id={student_id}, student_name='{student_name}', subject='{subject_name}' ({subject_code})")
                             snapshot_b64 = result.get('snapshot_base64')
                             # If there are violations, upload snapshot and insert rows
                             if result.get('violations'):
